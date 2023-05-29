@@ -1,13 +1,20 @@
 package handler
 
 import (
-	"GameAPI/model"
-	"github.com/gin-gonic/gin"
+	"RoRoDes/model"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) InitGameHandler(context *gin.Context) {
-	gameID, err := s.Storage.InitGameInDB()
+	user, ok := context.GetQuery("user")
+	if user == "" || !ok {
+		context.JSON(http.StatusBadRequest, model.Err{Error: "User is missing"})
+		return
+	}
+
+	gameID, err := s.Service.InitGame(user)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, model.Err{Error: "Database error: " + err.Error()})
 		return
@@ -23,7 +30,7 @@ func (s *Server) GetGameHandler(context *gin.Context) {
 		return
 	}
 
-	game, err := s.Storage.GetGameFromDB(gameID)
+	game, err := s.Service.GetGame(gameID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, model.Err{Error: "Database error: " + err.Error()})
 		return
@@ -35,4 +42,19 @@ func (s *Server) GetGameHandler(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, game)
+}
+
+func (s *Server) GetAllGameIdHandler(context *gin.Context) {
+	allId, err := s.Service.GetGameId()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, model.Err{Error: "Database error: " + err.Error()})
+		return
+	}
+
+	if len(allId) == 0 {
+		context.JSON(http.StatusNotFound, model.Err{Error: "No game"})
+		return
+	}
+
+	context.JSON(http.StatusOK, allId)
 }

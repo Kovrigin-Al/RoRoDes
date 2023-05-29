@@ -1,6 +1,8 @@
 CREATE TABLE game
 (
-    `game_id` CHAR(36) PRIMARY KEY
+    `game_id` CHAR(36) PRIMARY KEY,
+    `first_user` VARCHAR(33) NOT NULL,
+    `second_user` VARCHAR(33)
 );
 
 CREATE TABLE card
@@ -28,8 +30,8 @@ CREATE TABLE unit
 
 CREATE TABLE field
 (
-    `y`       INT NOT NULL,
-    `x`       INT NOT NULL,
+    `y`       INT      NOT NULL,
+    `x`       INT      NOT NULL,
     `unit_id` CHAR(36),
     `game_id` CHAR(36) NOT NULL,
     CONSTRAINT PRIMARY KEY (`x`, `y`, `game_id`),
@@ -38,3 +40,32 @@ CREATE TABLE field
     CONSTRAINT `FK_unit_id` FOREIGN KEY (`unit_id`)
         REFERENCES `unit` (`unit_id`)
 );
+
+CREATE TABLE user
+(
+    `login` VARCHAR(25) PRIMARY KEY
+);
+
+CREATE TABLE deck
+(
+    `id`         CHAR(36),
+    `user_login` CHAR(36),
+    CONSTRAINT PRIMARY KEY `PK_deck_user` (`id`, `user_login`)
+);
+
+CREATE TABLE card_in_deck
+(
+    `deck_id` CHAR(36),
+    `card_id` CHAR(36)
+);
+
+INSERT INTO deck
+VALUES ('6e7a3251-3333-4e15-7777-0a3739b11111',
+        'Boba');
+
+INSERT INTO card_in_deck
+VALUES ('6e7a3251-3333-4e15-7777-0a3739b11111',
+        '6e7a3251-0404-4e15-7777-0a3739b11111');
+
+
+

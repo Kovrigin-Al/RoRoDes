@@ -1,17 +1,17 @@
 package storage
 
 import (
-	"GameAPI/model"
-	"GameAPI/utilities"
+	"RoRoDes/model"
+	"RoRoDes/utilities"
 	"github.com/google/uuid"
 )
 
 const countOfFields = 40
 
-func (s *Storage) InitGameInDB() (string, error) {
+func (s *Storage) InitGameInDB(user string) (string, error) {
 	gameId := uuid.NewString()
 
-	_, err := s.DB.Exec("INSERT INTO game (`game_id`) VALUES (?)", gameId)
+	_, err := s.DB.Exec("INSERT INTO game (`game_id`, `first_user`) VALUES (?, ?)", gameId, user)
 	if err != nil {
 		return "", err
 	}
@@ -37,4 +37,15 @@ func (s *Storage) GetGameFromDB(gameID string) ([]model.FieldResponse, error) {
 	}
 
 	return game, nil
+}
+
+func (s *Storage) GetAllGameIdFromDB() ([]string, error) {
+	var allId []string
+
+	err := s.DB.Select(&allId, "SELECT `game_id` FROM game")
+	if err != nil {
+		return nil, err
+	}
+
+	return allId, nil
 }
